@@ -19,7 +19,22 @@ namespace CarShop.Library
         public int Qty { get; set; }
         public string Description { get; set; }                   
         public int Total { get; set; }
+        public void printReceipt()
+        {
+            string printRecepiet =
+                    $"\n" +
+                    $"Receipt\n\n" +
+                    $"Company name:\t\t{CompanyName}\n" +
+                    $"Company address:\t{CompanyAddress}\n\n" +
+                    $"Bill to:\t\t{CustomerName};{CustomerNumber}\n\n" +
+                    $"Ship to:\t\t{CustomerAddress}\n\n" +
+                    $"Receipt ID:\t\t{Id}\n" +
+                    $"Date:\t\t\t{Date}\n\n" +
+                    $"Qty\tDescription\t\t\t\t\t\t\tTotal price\n" +
+                    $"_____________________________________________________________________________________\n" +
+                    $"{Qty}\t{Description}\t\t{Total}\n\n";
 
-
+            Console.WriteLine(printRecepiet);
+        }
     }
 }

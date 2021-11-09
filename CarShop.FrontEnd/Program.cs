@@ -163,8 +163,8 @@ namespace CarShop.Frontend
             string yesNo = Console.ReadLine();
             if (yesNo == "Yes")
             {
-                string printOut = CarOperator.GetReceipt(receiptCar);
-                Console.WriteLine(printOut);
+                Receipt carReceipt = CarOperator.GetReceipt(receiptCar);
+                carReceipt.printReceipt();
             }
         }
     }

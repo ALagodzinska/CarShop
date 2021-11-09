@@ -48,7 +48,7 @@ namespace CarShop.Library
             return selectedCar;
         }
 
-        public string GetReceipt(Car receiptCar)
+        public Receipt GetReceipt(Car receiptCar)
         {
             var receipt = new Receipt();
 
@@ -89,21 +89,7 @@ namespace CarShop.Library
             receipt.Description = $"Car with {receiptCar.Id} id; {receiptCar.Model} model; {receiptCar.Year} year; {receiptCar.Color} color.";
             receipt.Total = receiptCar.Price * receipt.Qty;
 
-            //Recepiet
-            string printRecepiet = 
-                    $"\n" +
-                    $"Receipt\n\n" + 
-                    $"Company name:\t\t{receipt.CompanyName}\n" +
-                    $"Company address:\t{receipt.CompanyAddress}\n\n" +
-                    $"Bill to:\t\t{receipt.CustomerName};{receipt.CustomerNumber}\n\n" +
-                    $"Ship to:\t\t{receipt.CustomerAddress}\n\n" +                    
-                    $"Receipt ID:\t\t{receipt.Id}\n" +
-                    $"Date:\t\t\t{receipt.Date}\n\n" +
-                    $"Qty\tDescription\t\t\t\t\t\t\tTotal price\n" +
-                    $"_____________________________________________________________________________________\n" +
-                    $"{receipt.Qty}\t{receipt.Description}\t\t{receipt.Total}\n\n";
-
-            return printRecepiet;
+            return receipt;
         }        
     }    
 }
