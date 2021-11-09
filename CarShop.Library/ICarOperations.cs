@@ -9,8 +9,10 @@ namespace CarShop.Library
     public interface ICarOperations
     {
         public void AddCarToTheList(Car car);
-        public Car FindCar(int year);
+        public Car[] FindCarByYear(int year);
+        public Car[] FindCarByColor(string color);
         public int FindAvailableCarsCount();
-        public string GetRecipiet();
+        public string GetReceipt(Car receiptCar);
+        public Car BuyCar(int id);
     }
 }
