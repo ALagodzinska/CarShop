@@ -16,7 +16,6 @@ namespace CarShop.Library
         public string CustomerNumber { get; set; }        
         public string Id { get; set; }
         public string Date { get; set; }
-        public int Qty { get; set; }
         public string Description { get; set; }                   
         public int Total { get; set; }
         public void printReceipt()
@@ -30,9 +29,9 @@ namespace CarShop.Library
                     $"Ship to:\t\t{CustomerAddress}\n\n" +
                     $"Receipt ID:\t\t{Id}\n" +
                     $"Date:\t\t\t{Date}\n\n" +
-                    $"Qty\tDescription\t\t\t\t\t\t\tTotal price\n" +
-                    $"_____________________________________________________________________________________\n" +
-                    $"{Qty}\t{Description}\t\t{Total}\n\n";
+                    $"Description\t\t\t\t\t\t\tTotal price\n" +
+                    $"____________________________________________________________________________\n" +
+                    $"{Description}\t\t{Total}\n\n";
 
             Console.WriteLine(printRecepiet);
         }

@@ -84,11 +84,8 @@ namespace CarShop.Library
             receipt.Id = $"{carModelForId}-000{receiptCar.Id}";
 
             receipt.Date = DateTime.Now.ToString();
-
-            Console.WriteLine("Enter quantity you are willing to buy: ");
-            receipt.Qty = Convert.ToInt32(Console.ReadLine());
             receipt.Description = $"Car with {receiptCar.Id} id; {receiptCar.Model} model; {receiptCar.Year} year; {receiptCar.Color} color.";
-            receipt.Total = receiptCar.Price * receipt.Qty;
+            receipt.Total = receiptCar.Price;
 
             return receipt;
         }        
