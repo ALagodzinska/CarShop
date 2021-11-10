@@ -12,7 +12,7 @@ namespace CarShop.Library
         public Car[] FindCarByYear(int year);
         public Car[] FindCarByColor(string color);
         public int FindAvailableCarsCount();
-        public Receipt GetReceipt(Car receiptCar);
         public Car BuyCar(int id);
+        public Receipt GetReceipt(Car receiptCar);        
     }
 }

@@ -68,7 +68,6 @@ namespace CarShop.Frontend
             Console.WriteLine("5. Show list of all presented cars");
             Console.WriteLine("6. Buy a car");
         }
-
         public static Car CreateCarObject(int id)
         {
             var car = new Car
@@ -87,7 +86,6 @@ namespace CarShop.Frontend
 
             return car;
         }
-
         public static void AddCarToTheList()
         {
             var continues = true;

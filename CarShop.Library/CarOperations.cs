@@ -30,6 +30,7 @@ namespace CarShop.Library
         {
             return CarArray.Where(x => x != null && x.Year == year).ToArray();
         }
+
         public Car[] FindCarByColor(string color)
         {
             return CarArray.Where(x => x != null && x.Color == color).ToArray();
