@@ -1,93 +1,141 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CarShop.Library
 {
     public class CarOperations : ICarOperations
     {
-        //public List<Car> ListOfCars = new List<Car>();
-        public Car[] CarArray = new Car[100];
+        private const string TargetPath = @"C:\Users\anast\source\repos\CarShop1\SchoolFiles";
+        private const string TextFile = @"C:\Users\anast\source\repos\CarShop1\SchoolFiles\CarData.txt";
 
-        public void AddCarToTheList(Car car)
+        public void CreateDirectoryIfNotExists()
         {
-            //ListOfCars.Add(car);
-            var index = CarArray.Count(x => x != null);
-            // add car
-            CarArray[index] = car;
+            if (!Directory.Exists(TargetPath))
+            {
+                Directory.CreateDirectory(TargetPath);
+            }
         }
-
-        public int FindAvailableCarsCount()
+        public void CreateFileIfNotExists()
         {
-            return CarArray.Count(x => x != null && x.IsAvailable);
+            if (!File.Exists(TextFile))
+            {
+                File.Create(TextFile);
+            }
+        }
+        public List<Car> GetCarList()
+        {
+            List<Car> ListOfCars = new List<Car>();
+            char[] spearator = { ',' };
+            var carInfo = File.ReadLines(TextFile);
+            foreach (var line in carInfo)
+            {
+                String[] strlist = line.Split(spearator).ToArray();
+                var car = new Car()
+                {
+                    Id = Convert.ToInt32(strlist[0]),
+                    Model = strlist[1],
+                    Color = strlist[2],
+                    Year = Convert.ToInt32(strlist[3]),
+                    IsAvailable = Convert.ToBoolean(strlist[4])
+                };
+                ListOfCars.Add(car);
+            }
+            return ListOfCars;
+        }
+        public void AddCarToTheTextFile(Car car)
+        {
+            string[] carInfo = new string[5];
+
+            carInfo[0] = car.Id.ToString();
+            carInfo[1] = car.Model;
+            carInfo[2] = car.Color;
+            carInfo[3] = car.Year.ToString();
+            carInfo[4] = (car.IsAvailable).ToString();
+
+            var stringContent = String.Join(',', carInfo);
+
+            using (StreamWriter streamWriter = File.AppendText(TextFile))
+            {
+                streamWriter.WriteLine(stringContent);
+            }
+        }
+        public void FindAvailableCarsCount()
+        {
+            var count = GetCarList().Count(x => x != null && x.IsAvailable == true);
+            UserOutput.FindAvailableCarMessage(count);
         }
 
         public Car[] FindCarByYear(int year)
         {
-            return CarArray.Where(x => x != null && x.Year == year).ToArray();
+            var carList = GetCarList().Where(x => x != null && x.Year == year);
+
+            return carList.ToArray();
         }
 
-        public Car[] FindCarByColor(string color)
+        public void ByCar(int id)
         {
-            return CarArray.Where(x => x != null && x.Color == color).ToArray();
-        }
-
-        public Car BuyCar(int id)
-        {
-            var selectedCar = CarArray.FirstOrDefault(x => x.Id == id);
+            var selectedCar = GetCarList().FirstOrDefault(x => x.Id == id);
 
             if (selectedCar != null)
             {
                 selectedCar.Sold = true;
                 selectedCar.IsAvailable = false;
-            }
 
-            return selectedCar;
+                UserOutput.CongratulationMessage(selectedCar.Model);
+            }
+            else
+            {
+                UserOutput.NoCarWithIdMessage(id);
+            }
         }
 
-        public Receipt GetReceipt(Car receiptCar)
+        public string GetReceipt(Car car)
         {
-            var receipt = new Receipt();
-
-            Console.WriteLine("Enter your name and surname: ");
-            receipt.CustomerName = Console.ReadLine();
-
-            Console.WriteLine("Enter your address(street,city,country): ");
-            receipt.CustomerAddress = Console.ReadLine();
-
-            bool wrongInput = true;
-            while (wrongInput != false)
+            var receipt = new Recipient()
             {
-                Console.WriteLine("Enter your phone number(Phone number pattern: +XXX YYYYYYYY):");
-                var phoneNumber = Console.ReadLine();
+                Car = car,
+                Date = DateTime.Now,
+                RecipientId = Guid.NewGuid().ToString(),
+                RecipientName = "Car selling receipt"
+            };
 
-                string pattern = "\\+\\d{3}\\s\\d{8}";
-                var rgx = new Regex(pattern);
-                if (rgx.IsMatch(phoneNumber))
+            return @$"
+                        Receipt number: {receipt.RecipientId}
+                        Receipt name: {receipt.RecipientName}
+                        Model: {receipt.Car.Model}
+                        Year:  {receipt.Car.Year}
+                        Color: {receipt.Car.Color}
+                        Date:  {receipt.Date.Date}
+                    ";
+        }
+
+        public void GetCarByYear(int year)
+        {
+            var carArray = FindCarByYear(year);
+
+            foreach (var car in carArray)
+            {
+                UserOutput.FoundCarMessage(car.Id, car.Model);
+            }
+        }
+
+        public void ShowListOfAllCars()
+        {
+            var i = 0;
+
+            foreach (var car in GetCarList())
+            {
+                if (car != null)
                 {
-                    receipt.CustomerNumber = phoneNumber;
-                    wrongInput = false;
+                    UserOutput.ShowListOfCarsMessage(car.Id, car.Model, i);
                 }
-                else
-                {
-                    Console.WriteLine($"Phone number {phoneNumber} has wrong format");
 
-                }
-            }           
-
-            string carModel = receiptCar.Model;
-            string carModelForId = carModel.Substring(0, 2);
-            receipt.Id = $"{carModelForId}-000{receiptCar.Id}";
-
-            receipt.Date = DateTime.Now.ToString();
-            receipt.Description = $"Car with {receiptCar.Id} id; {receiptCar.Model} model; {receiptCar.Year} year; {receiptCar.Color} color.";
-            receipt.Total = receiptCar.Price;
-
-            return receipt;
-        }        
-    }    
+                i++;
+            }
+        }
+    }
 }

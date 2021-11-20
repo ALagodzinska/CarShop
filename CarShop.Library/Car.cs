@@ -20,23 +20,5 @@ namespace CarShop.Library
             get => Convert.ToInt32(Year) > 2010;
             set => isAvailable = value;
         }
-        public int Price 
-        {
-            get 
-            {
-                if (Year < 2005)
-                {
-                    return 5000;
-                }
-                else if (Year > 2005 && Year < 2015)
-                {
-                    return 10000;
-                }
-                else
-                {
-                    return 15000;
-                }
-            }
-        }
     }
 }

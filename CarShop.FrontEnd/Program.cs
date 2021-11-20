@@ -7,19 +7,37 @@ namespace CarShop.Frontend
 {
     class Program
     {
-        static readonly CarOperations CarOperator = new CarOperations();
+        private static readonly CarOperations CarOperator = new();
 
         static void Main(string[] args)
         {
-            ShowMenu();
+            try //because there is a lot of exceptions, to avoid breaking application
+            {//everything inside this block will catch an exception
+                CarOperator.CreateDirectoryIfNotExists();
+                CarOperator.CreateFileIfNotExists();
+                MainMethod(); //if we will have issues it will write an exception
+            }
+            catch (NullReferenceException exception)
+            {
+                Console.WriteLine($"Exception message: {exception.Message}");
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"Exception message: {exception.Message}");
+            }
+        }
 
-            string exit = "continue";
+        public static void MainMethod()
+        {
+            UserOutput.ShowMenu();
+
+            var exit = "continue";
 
             while (exit == "continue")
             {
-                string option = Console.ReadLine();
+                var option = Console.ReadLine();
 
-                if (option.Equals("exit"))
+                if (option is "exit") //if(option != null && option == exit)
                 {
                     exit = option;
                 }
@@ -28,141 +46,84 @@ namespace CarShop.Frontend
                 {
                     case "1":
                         //Add car to the list
-                        AddCarToTheList();
+                        AddingCarsToTheList();
                         break;
                     case "2":
                         //Find a car by is available
-                        Console.WriteLine($"Available car count is: {CarOperator.FindAvailableCarsCount()}");
+                        CarOperator.FindAvailableCarsCount();
                         break;
                     case "3":
                         //Get cars by year
-                        GetCarByYear();
+                        UserOutput.ProvideYearMessage();
+                        var year = Convert.ToInt32(Console.ReadLine());
+                        CarOperator.GetCarByYear(year);
                         break;
                     case "4":
-                        //Get cars by color
-                        GetCarByColor();
+                        //Show list of all presented cars
+                        CarOperator.ShowListOfAllCars();
                         break;
                     case "5":
-                        //Show list of all presented cars
-                        ShowListOfAllCars();
-                        break;
-                    case "6":
-                        //Buy a car
-                        Car receiptCar = BuyACar();
-                        if (receiptCar != null)
+                        //Buying a car
+                        UserOutput.ProvideCarIdMessage();
+                        var id = Convert.ToInt32(Console.ReadLine());
+
+                        CarOperator.ByCar(id);
+
+                        var carObject = CarOperator.GetCarList().FirstOrDefault(x => x.Id == id);
+
+                        if (carObject != null)
                         {
-                            ShowReceipt(receiptCar);
+                            UserOutput.ReceiptMessage(CarOperator.GetReceipt(carObject));
                         }
+
                         break;
                 }
-            };
+            }
         }
 
-        public static void ShowMenu()
+        public static Car CreateCarObject()
         {
-            Console.WriteLine("Please choose car operation:");
-            Console.WriteLine("1. Add car to the shop");
-            Console.WriteLine("2. Find car by is available");
-            Console.WriteLine("3. Find car by year");            
-            Console.WriteLine("4. Find car by color");
-            Console.WriteLine("5. Show list of all presented cars");
-            Console.WriteLine("6. Buy a car");
-        }
-        public static Car CreateCarObject(int id)
-        {
-            var car = new Car
+            var car = new Car();
+
+            UserOutput.ChooseIdMessage();
+            if (int.TryParse(Console.ReadLine(), out int id))
             {
-                Id = id
-            };
+                car.Id = id;
+            }
+            else
+            {
+                throw new Exception("Invalid car id");
+            }
 
-            Console.WriteLine("Please add car model:");
+            UserOutput.ChooseModelMessage();
             car.Model = Console.ReadLine();
 
-            Console.WriteLine("Add car color");
+            UserOutput.ChooseColorMessage();
             car.Color = Console.ReadLine();
 
-            Console.WriteLine("Add car year");
+            UserOutput.ChooseYearMessage();
             car.Year = Convert.ToInt32(Console.ReadLine());
 
             return car;
         }
-        public static void AddCarToTheList()
+
+        public static void AddingCarsToTheList()
         {
             var continues = true;
 
-            int id = 0;
             while (continues)
             {
-                var car = CreateCarObject(id);
-                CarOperator.AddCarToTheList(car);
+                var car = CreateCarObject();
+                CarOperator.AddCarToTheTextFile(car);
 
-                Console.WriteLine("Do you want to create more cars?(Yes/No)");
+                UserOutput.DoYouWantToAddMoreCarsMessage();
 
                 var yesNo = Console.ReadLine();
-                if (yesNo != "Yes")
-                {
-                    continues = false;
-                    ShowMenu();
-                }
 
-                id++;
-            }
-        }
-        public static void GetCarByYear()
-        {
-            Console.WriteLine("Please provide year: ");
-            var year = Convert.ToInt32(Console.ReadLine());
-            var carArray = CarOperator.FindCarByYear(year);
+                if (yesNo == "Yes") continue;
 
-            foreach (var car in carArray)
-            {
-                Console.WriteLine($"Found car Id: {car.Id} model: {car.Model}");
-            }
-        }
-        public static void GetCarByColor()
-        {
-            Console.WriteLine("Please provide color: ");
-            var color = Console.ReadLine();
-            var carArray = CarOperator.FindCarByColor(color);
-
-            foreach (var car in carArray)
-            {
-                Console.WriteLine($"Found car Id: {car.Id} model: {car.Model}");
-            }
-        }
-        public static void ShowListOfAllCars()
-        {
-            int i = 0;
-
-            foreach (var car in CarOperator.CarArray)
-            {
-                if (car != null)
-                {
-                    Console.WriteLine($"{i}. Car with {car.Id} model: {car.Model}");
-                }
-
-                i++;
-            }
-        }
-        public static Car BuyACar()
-        {
-            Console.WriteLine("Please enter an ID of a car you want to buy: ");
-            int id = Convert.ToInt32(Console.ReadLine());
-            Car foundCar = CarOperator.BuyCar(id);
-            if (foundCar == null)
-            {
-                Console.WriteLine("Car with that ID not found");
-            }
-            return foundCar;
-        }
-        public static void ShowReceipt(Car receiptCar)
-        {
-            Console.WriteLine($"Do you want to get a receipt for car purchase {receiptCar.Id}-{receiptCar.Model} ? Yes/No");
-            string yesNo = Console.ReadLine();
-            if (yesNo == "Yes")
-            {
-                Receipt carReceipt = CarOperator.GetReceipt(receiptCar);
-                carReceipt.printReceipt();
+                continues = false;
+                UserOutput.ShowMenu();
             }
         }
     }
