@@ -3,66 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace CarShop.Library
 {
-    public class CarOperations : ICarOperations
-    {
-        private const string TargetPath = @"C:\Users\anast\source\repos\CarShop1\SchoolFiles";
-        private const string TextFile = @"C:\Users\anast\source\repos\CarShop1\SchoolFiles\CarData.txt";
-
-        public void CreateDirectoryIfNotExists()
-        {
-            if (!Directory.Exists(TargetPath))
-            {
-                Directory.CreateDirectory(TargetPath);
-            }
-        }
-        public void CreateFileIfNotExists()
-        {
-            if (!File.Exists(TextFile))
-            {
-                File.Create(TextFile);
-            }
-        }
-        public List<Car> GetCarList()
-        {
-            List<Car> ListOfCars = new List<Car>();
-            char[] spearator = { ',' };
-            var carInfo = File.ReadLines(TextFile);
-            foreach (var line in carInfo)
-            {
-                String[] strlist = line.Split(spearator).ToArray();
-                var car = new Car()
-                {
-                    Id = Convert.ToInt32(strlist[0]),
-                    Model = strlist[1],
-                    Color = strlist[2],
-                    Year = Convert.ToInt32(strlist[3]),
-                    IsAvailable = Convert.ToBoolean(strlist[4])
-                };
-                ListOfCars.Add(car);
-            }
-            return ListOfCars;
-        }
-        public void AddCarToTheTextFile(Car car)
-        {
-            string[] carInfo = new string[5];
-
-            carInfo[0] = car.Id.ToString();
-            carInfo[1] = car.Model;
-            carInfo[2] = car.Color;
-            carInfo[3] = car.Year.ToString();
-            carInfo[4] = (car.IsAvailable).ToString();
-
-            var stringContent = String.Join(',', carInfo);
-
-            using (StreamWriter streamWriter = File.AppendText(TextFile))
-            {
-                streamWriter.WriteLine(stringContent);
-            }
-        }
+    public class CarOperations : DBOperations, ICarOperations
+    {        
         public void FindAvailableCarsCount()
         {
             var count = GetCarList().Count(x => x != null && x.IsAvailable == true);
@@ -82,8 +30,7 @@ namespace CarShop.Library
 
             if (selectedCar != null)
             {
-                selectedCar.Sold = true;
-                selectedCar.IsAvailable = false;
+                UpdateCarInfo(selectedCar);
 
                 UserOutput.CongratulationMessage(selectedCar.Model);
             }
@@ -102,6 +49,8 @@ namespace CarShop.Library
                 RecipientId = Guid.NewGuid().ToString(),
                 RecipientName = "Car selling receipt"
             };
+
+            AddCarReceiptToDb(receipt);
 
             return @$"
                         Receipt number: {receipt.RecipientId}

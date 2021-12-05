@@ -55,11 +55,6 @@ namespace CarShop.Library
             Console.WriteLine("Add car year");
         }
 
-        public static void ChooseIdMessage()
-        {
-            Console.WriteLine("Please add car id:");
-        }
-
         public static void DoYouWantToAddMoreCarsMessage()
         {
             Console.WriteLine("Do you want to create more cars?(Yes/No)");

@@ -8,13 +8,12 @@ namespace CarShop.Frontend
     class Program
     {
         private static readonly CarOperations CarOperator = new();
-
+        private static readonly DBOperations DbOperator = new();
         static void Main(string[] args)
         {
             try //because there is a lot of exceptions, to avoid breaking application
             {//everything inside this block will catch an exception
-                CarOperator.CreateDirectoryIfNotExists();
-                CarOperator.CreateFileIfNotExists();
+                DbOperator.CreateDbIfNotExsists();
                 MainMethod(); //if we will have issues it will write an exception
             }
             catch (NullReferenceException exception)
@@ -85,16 +84,6 @@ namespace CarShop.Frontend
         {
             var car = new Car();
 
-            UserOutput.ChooseIdMessage();
-            if (int.TryParse(Console.ReadLine(), out int id))
-            {
-                car.Id = id;
-            }
-            else
-            {
-                throw new Exception("Invalid car id");
-            }
-
             UserOutput.ChooseModelMessage();
             car.Model = Console.ReadLine();
 
@@ -114,7 +103,8 @@ namespace CarShop.Frontend
             while (continues)
             {
                 var car = CreateCarObject();
-                CarOperator.AddCarToTheTextFile(car);
+
+                DbOperator.AddCarToTheList(car);
 
                 UserOutput.DoYouWantToAddMoreCarsMessage();
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,16 +9,18 @@ namespace CarShop.Library
 {
     public class Car
     {
-        private bool isAvailable;
 
+        [Key]
         public int Id { get; set; }
         public string Model { get; set; }
         public int Year { get; set; }
         public string Color { get; set; }
         public bool Sold { get; set; }
+
+        private bool isAvailable = true;
         public bool IsAvailable
         {
-            get => Convert.ToInt32(Year) > 2010;
+            get => isAvailable;
             set => isAvailable = value;
         }
     }
